@@ -7,7 +7,7 @@ def get_long_desc():
     try:
         return subprocess.check_output(['pandoc', '-f', 'markdown', '-t', 'rst', 'README.mdown'])
     except:
-        print "WARNING: The long readme wasn't converted properly"
+        print("WARNING: The long readme wasn't converted properly")
 
 setup(name='mezzanine-events',
     version=__version__,
