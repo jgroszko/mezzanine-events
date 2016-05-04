@@ -51,20 +51,25 @@ class Event(Page, RichText):
         if self.lon and not self.lat:
             raise ValidationError("Latitude required if specifying longitude.")
 
+        location_to_geocode = self.mappable_location
         if not (self.lat and self.lon) and not self.mappable_location:
-            self.mappable_location = self.location.replace("\n",", ")
+            location_to_geocode = self.location.replace("\n",", ")
 
         if self.mappable_location: #location should always override lat/long if set
             g = GoogleMaps(domain=settings.MZEVENTS_GOOGLE_MAPS_DOMAIN)
             try:
-                location, (lat, lon) = g.geocode(self.mappable_location.encode('utf-8'))
+                location, (lat, lon) = g.geocode(location_to_geocode.encode('utf-8'))
+
+                self.mappable_location = location_to_geocode
+                self.lat = lat
+                self.lon = lon
+
             except GQueryError as e:
-                raise ValidationError("The mappable location you specified could not be found on {service}: \"{error}\" Try changing the mappable location, removing any business names, or leaving mappable location blank and using coordinates from getlatlon.com.".format(service="Google Maps", error=e.message))
+                if(not not self.mappable_location):
+                    raise ValidationError("The mappable location you specified could not be found on {service}: \"{error}\" Try changing the mappable location, removing any business names, or leaving mappable location blank and using coordinates from getlatlon.com.".format(service="Google Maps", error=e))
             except ValueError as e:
-                raise ValidationError("The mappable location you specified could not be found on {service}: \"{error}\" Try changing the mappable location, removing any business names, or leaving mappable location blank and using coordinates from getlatlon.com.".format(service="Google Maps", error=e.message))
-            self.mappable_location = location
-            self.lat = lat
-            self.lon = lon
+                if(not not self.mappable_location):
+                    raise ValidationError("The mappable location you specified could not be found on {service}: \"{error}\" Try changing the mappable location, removing any business names, or leaving mappable location blank and using coordinates from getlatlon.com.".format(service="Google Maps", error=e))
         
     def save(self, *args, **kwargs):
         # determine whether the page needs to be hidden

@@ -18,6 +18,7 @@ From {{page.event.date}}, {{page.event.start_time}} to {{page.event.end_date}}, 
 </p>
 
 <div class="row-fluid">
+        {% if page.event.lat and page.event.lon %}
 	<div class="span4">
 		<b>Address</b>
 		<address>
@@ -27,6 +28,7 @@ From {{page.event.date}}, {{page.event.start_time}} to {{page.event.end_date}}, 
 			</a>
 		</address>
 	</div>
+	{% endif %}
 	{% if page.event.speakers_list %}
 	<div class="span4">
 		<b>Speakers</b>

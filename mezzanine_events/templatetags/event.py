@@ -52,6 +52,10 @@ class GoogleStaticMapNode (template.Node):
         width = self.width
         height = self.height
         zoom = self.zoom
+
+        if(not event.lat or not event.lon):
+            return ""
+
         marker = quote('{:.6},{:.6}'.format(event.lat, event.lon))
         if settings.MZEVENTS_HIDPI_STATIC_MAPS:
             scale = 2
